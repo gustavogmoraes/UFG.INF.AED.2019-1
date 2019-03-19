@@ -7,9 +7,9 @@
             "command": "g++",
             "args": [
                 "-g", // Se compilar sem esse parametro, não inclui os arquivos de debug
-                "Listas/Lista1/1Cometa.c",
+                "Listas/Lista1/3Overflow.c",
                 "-o", 
-                "Listas/Lista1/1Cometa.exe"
+                "Listas/Lista1/3Overflow.exe"
             ],
             "group": {
                 "kind": "build",

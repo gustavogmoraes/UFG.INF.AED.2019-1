@@ -5,7 +5,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Listas/Lista1/1Cometa.exe",
+            "program": "${workspaceFolder}/Listas/Lista1/3Overflow.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/Listas/Lista1/",

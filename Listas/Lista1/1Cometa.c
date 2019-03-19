@@ -14,7 +14,7 @@ int ObtenhaProximoAnoPassagemCometa(int anoBase, int anoParaSoma, char operacao)
 		 if(anoParaSoma > anoBase)
 		 	return anoParaSoma;
 		 else
-		 	ObtenhaProximoAnoPassagemCometa(anoBase, anoParaSoma, '+');
+		 	return ObtenhaProximoAnoPassagemCometa(anoBase, anoParaSoma, '+');
 	   break;
 
 	   case '-':
@@ -23,7 +23,7 @@ int ObtenhaProximoAnoPassagemCometa(int anoBase, int anoParaSoma, char operacao)
 		 if(anoParaSoma < anoBase) 
 		 	return anoParaSomaAnterior;
 		 else 
-		 	ObtenhaProximoAnoPassagemCometa(anoBase, anoParaSoma, '-');
+		 	return ObtenhaProximoAnoPassagemCometa(anoBase, anoParaSoma, '-');
 	   break;
 	}
 
