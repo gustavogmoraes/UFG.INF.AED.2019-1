@@ -26,11 +26,13 @@ int ObtenhaProximoAnoPassagemCometa(int anoBase, int anoParaSoma, char operacao)
 		 	ObtenhaProximoAnoPassagemCometa(anoBase, anoParaSoma, '-');
 	   break;
 	}
+
+	return 0;
 }
 
 int main() {
 	int entrada, anoBase;
-	printf("Teste");
+	printf("Teste\n");
 	scanf("%i", &entrada);
 
 	anoBase = entrada;
@@ -41,5 +43,7 @@ int main() {
 	else {
 		printf("%i", ObtenhaProximoAnoPassagemCometa(anoBase, ANOINICIAL, '-'));
 	}
+
+	getchar();
 	return 0;
 }
