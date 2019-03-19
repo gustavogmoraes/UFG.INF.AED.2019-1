@@ -9,7 +9,7 @@
                 "-g", // Se compilar sem esse parametro, não inclui os arquivos de debug
                 "Listas/Lista1/3Overflow.c",
                 "-o", 
-                "Listas/Lista1/3Overflow.exe"
+                "Listas/Lista1/3Overflow"
             ],
             "group": {
                 "kind": "build",
