@@ -1,0 +1,3 @@
+1. Instalar um compilador de C
+https://github.com/LambdaSchool/CS-Wiki/wiki/Getting-Your-C-Compiler-Installed#windows
+Seguir tutorial da OptionB: Cygwin
