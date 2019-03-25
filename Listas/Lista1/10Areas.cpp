@@ -1,6 +1,13 @@
-#include <stdio.h>
-#include <string.h>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <math.h>
+#include <vector>
+#include <algorithm>
+
+#include <stdlib.h>
+
+using namespace std;
 
 const float pi = 3.14159265;
 
@@ -111,31 +118,44 @@ int ArredondeParaInteiroCom2Casas(float valor)
     return round(truncated);
 }
 
+vector<string> SplitString(string str, string token){
+    vector<string>result;
+    while(str.size()){
+        int index = str.find(token);
+        if(index!=string::npos){
+            result.push_back(str.substr(0,index));
+            str = str.substr(index+token.size());
+            if(str.size()==0)result.push_back(str);
+        }else{
+            result.push_back(str);
+            str = "";
+        }
+    }
+    return result;
+}
+
 int main(){
 	int repeticoes = 0;
-
-    scanf("%i", &repeticoes);
+    cin >> repeticoes;
     while(repeticoes > 0){
-		char *s;
-		fflush(stdin);
-		gets(s);
+		string entrada;
         char identificador;
         float parametro1, parametro2, parametro3;
 
-		char **parametros = NULL;
-		
-		split(s, ' ', &parametros);
+        getline(cin, entrada, '\n');
 
-        if (parametros[2] == NULL)
-            *parametros[2] = '0';
+        vector<string> vetor;
+        vetor = SplitString(entrada, " ");
 
-        if (parametros[3] == NULL)
-            *parametros[3] = '0';
-		
-		identificador = *parametros[0];
-		parametro1 = atof(parametros[1]);
-		parametro2 = atof(parametros[2]);
-		parametro3 = atof(parametros[3]);
+        string caracter = vetor[0];
+        string p1 = vetor[1];
+        string p2 = vetor[2];
+        string p3 = vetor[3];
+        
+        identificador = caracter[0];
+		parametro1 = atof(&p1[0]);
+		parametro2 = atof(&p2[0]);
+		parametro3 = atof(&p3[0]);
 
         float area = ObtenhaAreaDaFigura(identificador, parametro1, parametro2, parametro3);
 		
