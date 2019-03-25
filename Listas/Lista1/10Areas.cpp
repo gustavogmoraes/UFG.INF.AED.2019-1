@@ -1,168 +1,124 @@
 #include <iostream>
+#include <string>
 #include <sstream>
 #include <string>
+#include <string.h>
+#include <cstdlib>
+#include <sstream>
+#include <stdexcept>
 #include <math.h>
 #include <vector>
 #include <algorithm>
-
-#include <stdlib.h>
-
+ 
 using namespace std;
-
+ 
 const float pi = 3.14159265;
-
+ 
 float ObtenhaAreaDaFigura(char identificador, float parametro1, float parametro2, float parametro3){
-	float raio, raioMaior, raioMenor, ladoA, ladoB, ladoC, semiPerimetro, baseMaior, baseMenor, altura;
-	switch(identificador){
-		case 'C':
-			
-			raio = parametro1;
-			
-			return (pi * (raio *raio));
-		break;
-		
-		case 'E':
-			raioMaior = parametro1, raioMenor = parametro2;
-			
-			return (raioMaior * raioMenor * pi);
-		break;
-		
-		case 'T':
-			ladoA = parametro1;
-			ladoB = parametro2;
-			ladoC = parametro3;
-			
-			semiPerimetro = (ladoA + ladoB + ladoC) / 2;
-			
-			return sqrt(semiPerimetro * (semiPerimetro - ladoA) * (semiPerimetro - ladoB) * (semiPerimetro - ladoC));
-		break;
-		
-		case 'Z':
-			baseMaior = parametro1;
-			baseMenor = parametro2;
-			altura = parametro3;
-			
-			return (((baseMaior + baseMenor) * altura) / 2);
-		break;
-	}
-
+    float raio, raioMaior, raioMenor, ladoA, ladoB, ladoC, semiPerimetro, baseMaior, baseMenor, altura;
+    switch(identificador){
+        case 'C':
+            
+            raio = parametro1;
+            
+            return (pi * (raio *raio));
+        break;
+        
+        case 'E':
+            raioMaior = parametro1, raioMenor = parametro2;
+            
+            return (raioMaior * raioMenor * pi);
+        break;
+        
+        case 'T':
+            ladoA = parametro1;
+            ladoB = parametro2;
+            ladoC = parametro3;
+            
+            semiPerimetro = (ladoA + ladoB + ladoC) / 2;
+            
+            return sqrt(semiPerimetro * (semiPerimetro - ladoA) * (semiPerimetro - ladoB) * (semiPerimetro - ladoC));
+        break;
+        
+        case 'Z':
+            baseMaior = parametro1;
+            baseMenor = parametro2;
+            altura = parametro3;
+            
+            return (((baseMaior + baseMenor) * altura) / 2);
+        break;
+    }
+ 
     return 0;
 }
-
-int split (char *str, char c, char ***arr)
-{
-    int count = 1;
-    int token_len = 1;
-    int i = 0;
-    char *p;
-    char *t;
-
-    p = str;
-    while (*p != '\0')
-    {
-        if (*p == c)
-            count++;
-        p++;
-    }
-
-    *arr = (char**) malloc(sizeof(char*) * count);
-    if (*arr == NULL)
-        exit(1);
-
-    p = str;
-    while (*p != '\0')
-    {
-        if (*p == c)
-        {
-            (*arr)[i] = (char*) malloc( sizeof(char) * token_len );
-            if ((*arr)[i] == NULL)
-                exit(1);
-
-            token_len = 0;
-            i++;
-        }
-        p++;
-        token_len++;
-    }
-    (*arr)[i] = (char*) malloc( sizeof(char) * token_len );
-    if ((*arr)[i] == NULL)
-        exit(1);
-
-    i = 0;
-    p = str;
-    t = ((*arr)[i]);
-    while (*p != '\0')
-    {
-        if (*p != c && *p != '\0')
-        {
-            *t = *p;
-            t++;
-        }
-        else
-        {
-            *t = '\0';
-            i++;
-            t = ((*arr)[i]);
-        }
-        p++;
-    }
-
-    return count;
-}
-
+ 
 int ArredondeParaInteiroCom2Casas(float valor)
 {
     int tmp = valor * 10;
     float truncated = tmp / 10.0;
-
+ 
     return round(truncated);
 }
-
-vector<string> SplitString(string str, string token){
-    vector<string>result;
-    while(str.size()){
-        int index = str.find(token);
-        if(index!=string::npos){
-            result.push_back(str.substr(0,index));
-            str = str.substr(index+token.size());
-            if(str.size()==0)result.push_back(str);
-        }else{
-            result.push_back(str);
-            str = "";
-        }
+ 
+static vector<std::string> SplitString(const std::string &source, char delimiter)
+{
+    vector<std::string> output;
+    istringstream ss(source);
+    string nextItem;
+ 
+    while (std::getline(ss, nextItem, delimiter))
+    {
+        output.push_back(nextItem);
     }
-    return result;
+ 
+    return output;
 }
-
+ 
+float StringToDouble(std::string& message)
+{
+  stringstream ss(message);
+  float value;
+ 
+  ss >> value;
+  if (!ss)
+    throw invalid_argument(message);
+ 
+  return value;
+}
+ 
 int main(){
-	int repeticoes = 0;
+    int repeticoes = 0;
     cin >> repeticoes;
+    cin.ignore();
     while(repeticoes > 0){
-		string entrada;
         char identificador;
-        float parametro1, parametro2, parametro3;
-
-        getline(cin, entrada, '\n');
-
-        vector<string> vetor;
-        vetor = SplitString(entrada, " ");
-
-        string caracter = vetor[0];
-        string p1 = vetor[1];
-        string p2 = vetor[2];
-        string p3 = vetor[3];
-        
-        identificador = caracter[0];
-		parametro1 = atof(&p1[0]);
-		parametro2 = atof(&p2[0]);
-		parametro3 = atof(&p3[0]);
-
+        float parametro1 = 0, parametro2 = 0, parametro3 = 0;
+ 
+        string entrada, aux;
+        getline(cin, entrada);
+ 
+        vector<string> splitted = SplitString(entrada, ' ');
+ 
+        aux = splitted[0];
+        identificador = aux[0];
+        parametro1 = StringToDouble(splitted[1]);
+ 
+        if (splitted.size() >= 3)
+        {
+            parametro2 = StringToDouble(splitted[2]);
+        }
+ 
+        if (splitted.size() >= 4)
+        {
+            parametro3 = StringToDouble(splitted[3]);
+        }
+ 
         float area = ObtenhaAreaDaFigura(identificador, parametro1, parametro2, parametro3);
-		
-        printf("%i\n", ArredondeParaInteiroCom2Casas(area));
-
+        
+        std::cout << ArredondeParaInteiroCom2Casas(area) << "\n";
+ 
         repeticoes--;
-	}
-
+    }
+ 
     return 0;
 }

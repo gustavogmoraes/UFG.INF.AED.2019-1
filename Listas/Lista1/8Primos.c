@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+ 
 int main() {
     int x, *valor, i, numero, k, contador;
     
@@ -21,10 +21,10 @@ int main() {
             
         }
         if(contador > 0){
-            printf("N\n");
+            printf("composto\n");
         }
         else{
-            printf("S\n");
+            printf("primo\n");
         }
     }
     
