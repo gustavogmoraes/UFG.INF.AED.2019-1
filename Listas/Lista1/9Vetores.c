@@ -16,6 +16,12 @@ int main(){
 
         scanf("%s %s", &numeroA, &numeroB);
 
+        if (numeroA[0] == '0' || numeroB[0] == '0')
+        {
+            printf("0\n");
+            continue;
+        }
+
         int l1 = strlen(numeroA);
         int l2 = strlen(numeroB);
         for(i = l1 - 1, j = 0; i >= 0; i--, j++)
@@ -50,7 +56,7 @@ int main(){
 		
         for(;i >= 0;i--)
         {
-            printf("%i", vetorResposta[i]);
+            printf("%i", (int)vetorResposta[i]);
         }
 
         printf("\n");
