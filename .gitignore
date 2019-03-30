@@ -62,3 +62,7 @@ ImplementacaoLista
 *.ipch
 .vscode/ipch/362c1d26dd939f93/mmap_address.bin
 .vscode/ipch/c242bfc84aa2f0a1/mmap_address.bin
+Listas/Lista1/10Areas
+*.bin
+Listas/Lista2/1NumerosNaturais
+Listas/Lista2/2Fibonacci
