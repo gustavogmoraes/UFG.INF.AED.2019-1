@@ -14,25 +14,60 @@ const char AGUA = '.';
 const char PARTE_DE_NAVIO = '#';
 const char PARTE_DE_NAVIO_DESTRUIDA = '@';
 
-vector<vector<char>> Tabuleiro;
+vector< vector<char> > Tabuleiro;
+int NumeroDeLinhas;
+int NumeroDeColunas;
 
 int QuantidadeDeNaviosAfundados;
 
-void InicializeTabuleiro(int numeroDeLinhas, int numeroDeColunas)
+void InicializeTabuleiro()
 {
-    Tabuleiro = vector<vector<char>>(numeroDeLinhas, vector<char>(numeroDeColunas));
+    Tabuleiro = vector<vector<char> >(NumeroDeLinhas, vector<char>(NumeroDeColunas));
 }
 
-void LeiaTabuleiro(int numeroDeLinhas, int numeroDeColunas)
+void LeiaTabuleiro()
 {
-    cin.clear();
-	for(int a = 0; a < numeroDeLinhas; a++)
+	for(int a = 0; a < NumeroDeLinhas; a++)
     {
-        for(int j = 0; j < numeroDeColunas; j++)
+        for(int j = 0; j < NumeroDeColunas; j++)
         {
             cin >> Tabuleiro[a][j];
         }
     }
+}
+
+enum EnumTipoDeOperacao
+{
+    NORTE,
+    SUL,
+    LESTE,
+    OESTE
+};
+
+Coordenada OpereCoordenada(Coordenada coordenada, EnumTipoDeOperacao tipodeOperacao)
+{
+    Coordenada retorno;
+    switch(tipodeOperacao)
+    {
+        case NORTE:
+            retorno.X = coordenada.X;
+            retorno.Y = coordenada.Y + 1;
+            break;
+        case SUL:
+            retorno.X = coordenada.X;
+            retorno.Y = coordenada.Y - 1;
+            break;
+        case LESTE:
+            retorno.X = coordenada.X + 1;
+            retorno.Y = coordenada.Y;
+            break;
+        case OESTE:
+            retorno.X = coordenada.X - 1;
+            retorno.Y = coordenada.Y;
+            break;
+    }
+
+    return retorno;
 }
 
 vector<Coordenada> ObtenhaQuadrante(Coordenada coordenada)
@@ -40,47 +75,83 @@ vector<Coordenada> ObtenhaQuadrante(Coordenada coordenada)
     // Levar em conta os limites do tabuleiro --> esse é o erro atual
     vector<Coordenada> retorno;
 
-    Coordenada coordenada1;
-    coordenada1.X = coordenada.X - 1;
-    coordenada1.Y = coordenada.Y;
+    for(int i = 0; i < 4; i++)
+    {
+        Coordenada operada = OpereCoordenada(coordenada, (EnumTipoDeOperacao)i);
 
-    retorno.push_back(coordenada1);
-
-    Coordenada coordenada2;
-    coordenada2.X = coordenada.X + 1;
-    coordenada2.Y = coordenada.Y;
-
-    retorno.push_back(coordenada2);
-
-    Coordenada coordenada3;
-    coordenada3.X = coordenada.X;
-    coordenada3.Y = coordenada.Y - 1;
-
-    retorno.push_back(coordenada3);
-
-    Coordenada coordenada4;
-    coordenada4.X = coordenada.X;
-    coordenada4.Y = coordenada.Y + 1;
-
-    retorno.push_back(coordenada4);
+        if(operada.X != -1 &&
+           operada.Y != -1 &&
+           operada.X < NumeroDeLinhas &&
+           operada.Y < NumeroDeColunas)
+        {
+            retorno.push_back(operada);
+        }
+    }
 
     return retorno;
 }
 
-bool VerifiqueSeNavioFoiDestruidoCompletamente(Coordenada coordenada)
+char LeiaCoordenada(Coordenada coordenada)
 {
-    vector<Coordenada> quadrante = ObtenhaQuadrante(coordenada);
-    bool resultado = true;
+    return Tabuleiro[coordenada.X][coordenada.Y];
+}
 
-    int cont = quadrante.capacity();
-
-    for(int i = 0; i < 4; i++)
+bool VerifiqueSeCoordenadaJaEstahNoNavio(Coordenada coordenada, vector<Coordenada> navio)
+{
+    for (int i = 0; i < navio.capacity(); i++)
     {
-        if(Tabuleiro[quadrante[i].X][quadrante[i].Y] == '#')
-            resultado = false;
+        if(navio[i].X == coordenada.X && navio[i].Y == coordenada.Y)
+            return true;
     }
 
-    return resultado;
+    return false;
+}
+
+bool JaFoiProcessada(vector<Coordenada> processadas, Coordenada coordenada)
+{
+    for (int i = 0; i < processadas.capacity(); i++)
+    {
+        if(processadas[i].X == coordenada.X && processadas[i].Y == coordenada.Y)
+            return true;
+    }
+
+    return false;
+}
+
+void PreenchaNavio(vector<Coordenada> navio, Coordenada coordenadaDeUmaParte, vector<Coordenada> processadas)
+{
+    processadas.push_back(coordenadaDeUmaParte);
+    
+    if(LeiaCoordenada(coordenadaDeUmaParte) == PARTE_DE_NAVIO || 
+       LeiaCoordenada(coordenadaDeUmaParte) == PARTE_DE_NAVIO_DESTRUIDA)
+    {
+        if(!VerifiqueSeCoordenadaJaEstahNoNavio(coordenadaDeUmaParte, navio))
+            navio.push_back(coordenadaDeUmaParte);
+    }
+
+    vector<Coordenada> quadrante = ObtenhaQuadrante(coordenadaDeUmaParte);
+    for (int i = 0; i < quadrante.capacity() - 1; i++)
+    {
+        if(JaFoiProcessada(processadas, quadrante[i]))
+            continue;
+        PreenchaNavio(navio, quadrante[i], processadas);
+    }
+}
+
+bool VerifiqueSeNavioFoiDestruidoCompletamente(Coordenada coordenada)
+{
+    vector<Coordenada> navio, processadas;
+    PreenchaNavio(navio, coordenada, processadas);
+
+    int contNavio = navio.capacity();
+
+    for(int i = 0; i < contNavio; i++)
+    {
+        if(Tabuleiro[navio[i].X][navio[i].Y] == AGUA)
+            return false;
+    }
+
+    return true;
 }
 
 void EfetueDisparo(Coordenada coordenada)
@@ -97,12 +168,10 @@ void EfetueDisparo(Coordenada coordenada)
 
 int main()
 {
-    int numeroDeLinhas, numeroDeColunas;
+    cin >> NumeroDeLinhas >> NumeroDeColunas;
 
-    cin >> numeroDeLinhas >> numeroDeColunas;
-
-    InicializeTabuleiro(numeroDeLinhas, numeroDeColunas);
-    LeiaTabuleiro(numeroDeLinhas, numeroDeColunas);
+    InicializeTabuleiro();
+    LeiaTabuleiro();
     
     cin.clear();
 
@@ -124,7 +193,7 @@ int main()
         i++;
     }
 
-    cout << QuantidadeDeNaviosAfundados;
+    cout << QuantidadeDeNaviosAfundados << "\n";
 
     return 0;
 }
