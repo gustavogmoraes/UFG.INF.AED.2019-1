@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -72,7 +73,6 @@ Coordenada OpereCoordenada(Coordenada coordenada, EnumTipoDeOperacao tipodeOpera
 
 vector<Coordenada> ObtenhaQuadrante(Coordenada coordenada)
 {
-    // Levar em conta os limites do tabuleiro --> esse é o erro atual
     vector<Coordenada> retorno;
 
     for(int i = 0; i < 4; i++)
@@ -107,41 +107,15 @@ bool VerifiqueSeCoordenadaJaEstahNoNavio(Coordenada coordenada, vector<Coordenad
     return false;
 }
 
-bool JaFoiProcessada(vector<Coordenada> processadas, Coordenada coordenada)
+vector<Coordenada> ObtenhaNavio(Coordenada coordenada)
 {
-    for (int i = 0; i < processadas.capacity(); i++)
-    {
-        if(processadas[i].X == coordenada.X && processadas[i].Y == coordenada.Y)
-            return true;
-    }
-
-    return false;
-}
-
-void PreenchaNavio(vector<Coordenada> navio, Coordenada coordenadaDeUmaParte, vector<Coordenada> processadas)
-{
-    processadas.push_back(coordenadaDeUmaParte);
-    
-    if(LeiaCoordenada(coordenadaDeUmaParte) == PARTE_DE_NAVIO || 
-       LeiaCoordenada(coordenadaDeUmaParte) == PARTE_DE_NAVIO_DESTRUIDA)
-    {
-        if(!VerifiqueSeCoordenadaJaEstahNoNavio(coordenadaDeUmaParte, navio))
-            navio.push_back(coordenadaDeUmaParte);
-    }
-
-    vector<Coordenada> quadrante = ObtenhaQuadrante(coordenadaDeUmaParte);
-    for (int i = 0; i < quadrante.capacity() - 1; i++)
-    {
-        if(JaFoiProcessada(processadas, quadrante[i]))
-            continue;
-        PreenchaNavio(navio, quadrante[i], processadas);
-    }
+    vector<Coordenada> vetor;
+    return vetor;
 }
 
 bool VerifiqueSeNavioFoiDestruidoCompletamente(Coordenada coordenada)
 {
-    vector<Coordenada> navio, processadas;
-    PreenchaNavio(navio, coordenada, processadas);
+    vector<Coordenada> navio = ObtenhaNavio(coordenada);
 
     int contNavio = navio.capacity();
 
@@ -165,35 +139,112 @@ void EfetueDisparo(Coordenada coordenada)
     }
 }
 
+// Program to count islands in boolean 2D matrix 
+#include <stdio.h> 
+#include <string.h> 
+#include <stdbool.h> 
+  
+#define ROW 100 
+#define COL 100
+  
+// A function to check if a given cell (row, col) can be included in DFS 
+int isSafe(int M[][COL], int row, int col, bool visited[][COL]) 
+{ 
+    // row number is in range, column number is in range and value is 1  
+    // and not yet visited 
+    return (row >= 0) && (row < NumeroDeLinhas) &&      
+           (col >= 0) && (col < NumeroDeColunas) &&       
+           (M[row][col] && !visited[row][col]);  
+} 
+  
+// A utility function to do DFS for a 2D boolean matrix. It only considers 
+// the 8 neighbours as adjacent vertices 
+// DFS: Depht First Search
+void DFS(int M[][COL], int row, int col, bool visited[][COL]) 
+{ 
+    // These arrays are used to get row and column numbers of 8 neighbours  
+    // of a given cell 
+    static int rowNbr[] = {-1, -1, -1,  0, 0,  1, 1, 1}; 
+    static int colNbr[] = {-1,  0,  1, -1, 1, -1, 0, 1}; 
+  
+    // Mark this cell as visited 
+    visited[row][col] = true; 
+  
+    // Recur for all connected neighbours 
+    for (int k = 0; k < 8; ++k) 
+        if (isSafe(M, row + rowNbr[k], col + colNbr[k], visited) ) 
+            DFS(M, row + rowNbr[k], col + colNbr[k], visited); 
+} 
+  
+// The main function that returns count of islands in a given boolean 
+// 2D matrix 
+int countIslands(int M[][COL]) 
+{ 
+    // Make a bool array to mark visited cells. 
+    // Initially all cells are unvisited 
+    bool visited[ROW][COL]; 
+    memset(visited, 0, sizeof(visited)); 
+  
+    // Initialize count as 0 and travese through the all cells of given matrix 
+    int count = 0; 
+    for (int i = 0; i < NumeroDeLinhas; ++i) 
+        for (int j = 0; j < NumeroDeColunas; ++j) 
+            if (M[i][j] && !visited[i][j]) // If a cell with value 1 is not 
+            {                              // visited yet, then new island found 
+                DFS(M, i, j, visited);     // Visit all cells in this island. 
+                ++count;                   // and increment island count 
+            } 
+  
+    return count; 
+} 
+  
+// Driver program to test above function 
+int main() 
+{ 
+    int M[][COL]= 
+    {   {1, 1, 0, 0, 0}, 
+        {0, 1, 0, 0, 1}, 
+        {1, 0, 0, 1, 1}, 
+        {0, 0, 0, 0, 0}, 
+        {1, 0, 1, 0, 1} 
+    };
+    NumeroDeLinhas = 5;
+    NumeroDeColunas = 5; 
+  
+    printf("Number of islands is: %d\n", countIslands(M)); 
+  
+    return 0; 
+} 
 
-int main()
-{
-    cin >> NumeroDeLinhas >> NumeroDeColunas;
+// int main()
+// {
+//     cin >> NumeroDeLinhas >> NumeroDeColunas;
 
-    InicializeTabuleiro();
-    LeiaTabuleiro();
+//     InicializeTabuleiro();
+//     LeiaTabuleiro();
     
-    cin.clear();
+//     cin.clear();
 
-    int numeroDeDisparos;
-    cin >> numeroDeDisparos;
+//     int numeroDeDisparos;
+//     cin >> numeroDeDisparos;
 
-    QuantidadeDeNaviosAfundados = 0;
-    int i = 0;
-    while(i < numeroDeDisparos)
-    {
-        Coordenada coordenadaDisparo;
-        cin >> coordenadaDisparo.X >> coordenadaDisparo.Y;
+//     QuantidadeDeNaviosAfundados = 0;
+//     int i = 0;
+//     while(i < numeroDeDisparos)
+//     {
+//         Coordenada coordenadaDisparo;
+//         cin >> coordenadaDisparo.X >> coordenadaDisparo.Y;
         
-        // Ajustando para índice 0
-        coordenadaDisparo.X--;
-        coordenadaDisparo.Y--;
+//         // Ajustando para índice 0
+//         coordenadaDisparo.X--;
+//         coordenadaDisparo.Y--;
 
-        EfetueDisparo(coordenadaDisparo);
-        i++;
-    }
+//         EfetueDisparo(coordenadaDisparo);
+//         i++;
+//     }
 
-    cout << QuantidadeDeNaviosAfundados << "\n";
+//     cout << QuantidadeDeNaviosAfundados << "\n";
 
-    return 0;
-}
+//     return 0;
+// }
+
