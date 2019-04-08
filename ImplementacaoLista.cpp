@@ -35,7 +35,7 @@ class List
 
         int Count()
         {
-            return _vetor.capacity();
+            return _vetor.size();
         }
 
         T& First()
@@ -92,7 +92,7 @@ class List
 
         // int GetIndexOf(T item)
         // {
-        //     for (int i = 0; i < vetor.capacity(); i++)
+        //     for (int i = 0; i < vetor.size(); i++)
         //     {
         //         if (vetor[i] == item)
         //             return i;

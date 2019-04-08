@@ -79,8 +79,8 @@ vector<Coordenada> ObtenhaQuadrante(Coordenada coordenada)
     {
         Coordenada operada = OpereCoordenada(coordenada, (EnumTipoDeOperacao)i);
 
-        if(operada.X != -1 &&
-           operada.Y != -1 &&
+        if(operada.X >= 0 &&
+           operada.Y >= 0 &&
            operada.X < NumeroDeLinhas &&
            operada.Y < NumeroDeColunas)
         {
@@ -98,7 +98,7 @@ char LeiaCoordenada(Coordenada coordenada)
 
 bool VerifiqueSeCoordenadaJaEstahNoSub(Coordenada coordenada, vector<Coordenada> navio)
 {
-    for (int i = 0; i < navio.capacity(); i++)
+    for (int i = 0; i < navio.size(); i++)
     {
         if(navio[i].X == coordenada.X && navio[i].Y == coordenada.Y)
             return true;
@@ -117,7 +117,9 @@ vector<Coordenada> ObtenhaNavio(Coordenada coordenada, vector<Coordenada> &subNa
     }
 
     vector<Coordenada> quadrante = ObtenhaQuadrante(coordenada);
-    for(int i = 0; i < quadrante.capacity() -1; i++)
+    int tamanho, i;
+    tamanho = quadrante.size();
+    for(i = 0; i < tamanho; i++)
     {
         Coordenada quad = quadrante[i];
         if(LeiaCoordenada(quad) == PARTE_DE_NAVIO ||
@@ -136,7 +138,7 @@ bool VerifiqueSeNavioFoiDestruidoCompletamente(Coordenada coordenada)
     vector<Coordenada> init;
     vector<Coordenada> navio = ObtenhaNavio(coordenada, init);
 
-    int contNavio = navio.capacity();
+    int contNavio = navio.size();
     if(contNavio == 1)
         return true;
 
@@ -175,20 +177,25 @@ int main()
 
     QuantidadeDeNaviosAfundados = 0;
     int i = 0;
-    while(i < numeroDeDisparos)
+
+    try
     {
-        Coordenada coordenadaDisparo;
-        cin >> coordenadaDisparo.X >> coordenadaDisparo.Y;
-        
-        // Ajustando para índice 0
-        coordenadaDisparo.X--;
-        coordenadaDisparo.Y--;
+        while(i < numeroDeDisparos)
+        {
+            Coordenada coordenadaDisparo;
+            cin >> coordenadaDisparo.X >> coordenadaDisparo.Y;
+            
+            // Ajustando para índice 0
+            coordenadaDisparo.X--;
+            coordenadaDisparo.Y--;
 
-        EfetueDisparo(coordenadaDisparo);
-        i++;
+            EfetueDisparo(coordenadaDisparo);
+            i++;
+        }
     }
+    catch(int e) { }
 
-    cout << QuantidadeDeNaviosAfundados << "\n";
+    cout << QuantidadeDeNaviosAfundados;
 
     return 0;
 }
