@@ -3,35 +3,27 @@
 
 using namespace std;
 
-int ObtenhaResto(int dividendo, int divisor)
-{
-    return dividendo % divisor;
-}
-
-string ConvertaDecimalParaBinario(int numeroDecimal)
-{
-    string retorno;
-    while(numeroDecimal > 0)
-    {
-        int resto = ObtenhaResto(numeroDecimal, 2);
-        std::stringstream ss;
-        ss << resto;
-        retorno.append(ss.str());
-        numeroDecimal = numeroDecimal / 2;
-    }
-
-    return retorno;
-}
+ int ConvertaDecimalParaBinario(int numeroDecimal) 
+{ 
+    if (numeroDecimal == 0)  
+        return 0;  
+    else
+        return (numeroDecimal % 2 + 10 * ConvertaDecimalParaBinario(numeroDecimal / 2)); 
+} 
 
 int main()
 {
     int quantidadeDeTestes, numeroDecimal;
+    
+    cin >> quantidadeDeTestes;
 
-    while (int i = 0 < quantidadeDeTestes)
+    int i = 0;
+    while (i < quantidadeDeTestes)
     {
+		i++;
         cin >> numeroDecimal;
 
-        cout << ConvertaDecimalParaBinario(numeroDecimal);
+        cout << ConvertaDecimalParaBinario(numeroDecimal) << "\n";
     }
 
     return 0;
