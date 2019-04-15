@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <functional>
 
 using namespace std;
 
@@ -12,21 +14,21 @@ class Produto
 
 void ImprimaProduto(Produto produto)
 {
-    cout << "Codigo: " << produto.Codigo << "\n";
-    cout << "Nome: " << produto.Nome << "\n";
+    std::cout << "Codigo: " << produto.Codigo << "\n";
+    std::cout << "Nome: " << produto.Nome << "\n";
 }
 
 template <typename T>
 class List
 {
     private:
-        std::vector<T> _vetor;
+        vector<T> _vetor;
 
         int IndexOfLast()
         {
             return Count() - 1;
         }
-    
+
     public:
         T& operator[] (int index)
         {
@@ -84,46 +86,149 @@ class List
             }
         }
 
+        void ForEach(function<void(T&)> action)
+        {
+            for (int i =  0; i < Count(); i++)
+            {
+                action(_vetor[i]);
+            }
+        }
+
+        #pragma region Sort
+
+        // A utility function to swap two elements 
+        void swap(int* a, int* b) 
+        { 
+            int t = *a; 
+            *a = *b; 
+            *b = t; 
+        } 
+        
+        /* This function takes last element as pivot, places 
+        the pivot element at its correct position in sorted 
+            array, and places all smaller (smaller than pivot) 
+        to left of pivot and all greater elements to right 
+        of pivot */
+        int partition (int arr[], int low, int high) 
+        { 
+            int pivot = arr[high];    // pivot 
+            int i = (low - 1);  // Index of smaller element 
+        
+            for (int j = low; j <= high- 1; j++) 
+            { 
+                // If current element is smaller than or 
+                // equal to pivot 
+                if (arr[j] <= pivot) 
+                { 
+                    i++;    // increment index of smaller element 
+                    swap(&arr[i], &arr[j]); 
+                } 
+            } 
+            swap(&arr[i + 1], &arr[high]); 
+            return (i + 1); 
+        } 
+        
+        /* The main function that implements QuickSort 
+        arr[] --> Array to be sorted, 
+        low  --> Starting index, 
+        high  --> Ending index */
+        void quickSort(int arr[], int low, int high) 
+        { 
+            if (low < high) 
+            { 
+                /* pi is partitioning index, arr[p] is now 
+                at right place */
+                int pi = partition(arr, low, high); 
+        
+                // Separately sort elements before 
+                // partition and after partition 
+                quickSort(arr, low, pi - 1); 
+                quickSort(arr, pi + 1, high); 
+            } 
+        } 
+
         // QuickSort
         void Sort()
         {
 
         }
 
-        // int GetIndexOf(T item)
-        // {
-        //     for (int i = 0; i < vetor.size(); i++)
-        //     {
-        //         if (vetor[i] == item)
-        //             return i;
-        //     }
+        void SortBy(function<string(T)>& propertyGetter)
+        {
 
-        //     return 0;
-        // }
+        }
+
+        #pragma endregion
+
+        // Busca Binaria
+        // Espera-se que o vetor esteja ordenado
+        int BuscaBinaria(int vetor[], int tamanho, int chave)
+        {
+            int cursor = 0;
+            int ultimoElemento = tamanho - 1;
+            int meio;
+            while (cursor <= ultimoElemento)
+            {
+                meio = (cursor + ultimoElemento) / 2;
+                if (vetor[meio] == chave)
+                    return meio;
+                else
+                {
+                    if (chave > vetor[meio])
+                        cursor = meio + 1;
+                    else
+                        ultimoElemento = meio - 1;
+                }
+            }
+
+            return -1;
+        }
+
+        //T&
+        T* Find(function<bool(T)>& predicate)
+		{
+			for (int i = 0; i < _vetor.size(); i++)
+			{
+				if (predicate(_vetor[i]))
+				{
+					return &_vetor[i];
+				}
+			}
+
+			return nullptr; // T();
+		}
 };
- 
+
 int main()
 {
     List<Produto> listaDeProdutos;
+
+    Produto produto2;
+    produto2.Codigo = 2;
+    produto2.Nome = "Teste2";
 
     Produto produto;
     produto.Codigo = 1;
     produto.Nome = "Teste";
 
-    Produto produto2;
-    produto2.Codigo = 2;
-    produto2.Nome = "Bosta";
+    listaDeProdutos.Add(produto2);
+    listaDeProdutos.Add(produto);
 
-    List<Produto> lista2;
-    lista2.Add(produto);
-    lista2.Add(produto2);
+    function<void(Produto&)> lambda = [](Produto& x) { x.Nome = "Mudei"; };
+    listaDeProdutos.ForEach(lambda);
 
-    listaDeProdutos.AddRange(lista2);
+    listaDeProdutos.ForEach(ImprimaProduto);
 
-    ImprimaProduto(listaDeProdutos.Last());
+    //function<void(Produto*)> lambda2 = [](Produto* x) { ImprimaProduto(*x); };
+    //listaDeProdutos.ForEach(lambda2);
 
-    //cout << listaDeProdutos.GetIndexOf(produto2);
+    //function<string(Produto)> lambda1 = [](Produto x) { return to_string(x.Codigo); };
+    //listaDeProdutos.SortBy(lambda1);
 
-    cout << "\n";
-    //system("clear");
-}
+    //function<bool(Produto)> lambda = [](Produto x) { return x.Codigo == 3; };
+    //Produto encontrado = *listaDeProdutos.Find(lambda);
+
+
+    std::cout << "\n";
+    //std::system("clear");
+}   
