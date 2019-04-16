@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <map>
 
 using namespace std;
 
@@ -18,6 +19,39 @@ void ImprimaProduto(Produto produto)
     std::cout << "Nome: " << produto.Nome << "\n";
 }
 
+static map<string, function<int(string, string)>> MapeamentoDeFuncoesDeComparacao =
+{
+    { "string", [](string x, string y) 
+        {   if (x > y) return -1;
+            if (x == y) return 0;
+            return 1; 
+        } 
+    },
+    { "int", [](string x, string y) 
+        {   if (stoi(x) > stoi(y)) return -1;
+            if (stoi(x) == stoi(y)) return 0;
+            return 1; 
+        } 
+    },
+    { "float", [](string x, string y) 
+        {   if (stof(x) > stof(y)) return -1;
+            if (stof(x) == stof(y)) return 0;
+            return 1; 
+        } 
+    },
+    { "double", [](string x, string y) 
+        {   if (stod(x) > stod(y)) return -1;
+            if (stod(x) == stod(y)) return 0;
+            return 1; 
+        } 
+    },
+};
+
+static int Compare(string tipoDaPropriedade, string x, string y)
+{
+    return MapeamentoDeFuncoesDeComparacao[tipoDaPropriedade](x, y);
+}
+
 template <typename T>
 class List
 {
@@ -28,6 +62,58 @@ class List
         {
             return Count() - 1;
         }
+
+        #pragma region Sort
+
+        // Troca dois elementos de posição
+        void TroqueElementos(T* a, T* b) 
+        { 
+            T temporario = *a; 
+            *a = *b; 
+            *b = temporario;
+        } 
+
+        int SortByCompareTo(function<string(T)>& propertyGetter, string tipoDaPropriedade, T x, T y)
+        {
+            return Compare(tipoDaPropriedade, propertyGetter(x), propertyGetter(y));
+        }
+        
+        // Seleciona o último elemento como pivô, coloca ele na posição correta de acordo
+        // com a ordenação, depois coloca todos os menores à esquerda e os maiores à direita.
+        // Retorna o índice de partição.
+        int SortByParticioneVetor(function<string(T)>& propertyGetter, string tipoDaPropriedade, int indiceInicial, int indiceFinal)
+        {
+            T pivo = _vetor[indiceFinal];
+            int indiceDoMenorElemento = (indiceInicial - 1);
+        
+            for (int i = indiceInicial; i <= indiceFinal - 1; i++) 
+            { 
+                if (SortByCompareTo(propertyGetter, tipoDaPropriedade, _vetor[i], pivo) <= 0) 
+                { 
+                    indiceDoMenorElemento++;
+                    TroqueElementos(&_vetor[indiceDoMenorElemento], &_vetor[i]); 
+                } 
+            }
+
+            TroqueElementos(&_vetor[indiceDoMenorElemento + 1], &_vetor[indiceFinal]);
+
+            return (indiceDoMenorElemento + 1); 
+        }
+
+        void SortByAux(function<string(T)>& propertyGetter, string tipoDaPropriedade, int indiceInicial, int indiceFinal)
+        {
+            if(indiceInicial < indiceFinal)
+            {
+                int indiceDeParticao = SortByParticioneVetor(propertyGetter, tipoDaPropriedade, indiceInicial, indiceFinal);
+
+                // Ordena os elementos à esquerda e à direita do
+                // índice de partição, separadamente, antes e depois da partição 
+                SortByAux(propertyGetter, tipoDaPropriedade, indiceInicial, indiceDeParticao - 1); 
+                SortByAux(propertyGetter, tipoDaPropriedade, indiceDeParticao + 1, indiceFinal); 
+            }
+        }
+
+        #pragma endregion
 
     public:
         T& operator[] (int index)
@@ -94,98 +180,16 @@ class List
             }
         }
 
-        #pragma region Sort
-
-        // A utility function to swap two elements 
-        void swap(int* a, int* b) 
-        { 
-            int t = *a; 
-            *a = *b; 
-            *b = t; 
-        } 
-        
-        /* This function takes last element as pivot, places 
-        the pivot element at its correct position in sorted 
-            array, and places all smaller (smaller than pivot) 
-        to left of pivot and all greater elements to right 
-        of pivot */
-        int partition (int arr[], int low, int high) 
-        { 
-            int pivot = arr[high];    // pivot 
-            int i = (low - 1);  // Index of smaller element 
-        
-            for (int j = low; j <= high- 1; j++) 
-            { 
-                // If current element is smaller than or 
-                // equal to pivot 
-                if (arr[j] <= pivot) 
-                { 
-                    i++;    // increment index of smaller element 
-                    swap(&arr[i], &arr[j]); 
-                } 
-            } 
-            swap(&arr[i + 1], &arr[high]); 
-            return (i + 1); 
-        } 
-        
-        /* The main function that implements QuickSort 
-        arr[] --> Array to be sorted, 
-        low  --> Starting index, 
-        high  --> Ending index */
-        void quickSort(int arr[], int low, int high) 
-        { 
-            if (low < high) 
-            { 
-                /* pi is partitioning index, arr[p] is now 
-                at right place */
-                int pi = partition(arr, low, high); 
-        
-                // Separately sort elements before 
-                // partition and after partition 
-                quickSort(arr, low, pi - 1); 
-                quickSort(arr, pi + 1, high); 
-            } 
-        } 
-
-        // QuickSort
-        void Sort()
+        void SortBy(function<string(T)>& propertyGetter, string tipoDaPropriedade)
         {
+            int indiceInicial = 0;
+            int indiceFinal = Count() - 1;
 
-        }
-
-        void SortBy(function<string(T)>& propertyGetter)
-        {
-
-        }
-
-        #pragma endregion
-
-        // Busca Binaria
-        // Espera-se que o vetor esteja ordenado
-        int BuscaBinaria(int vetor[], int tamanho, int chave)
-        {
-            int cursor = 0;
-            int ultimoElemento = tamanho - 1;
-            int meio;
-            while (cursor <= ultimoElemento)
-            {
-                meio = (cursor + ultimoElemento) / 2;
-                if (vetor[meio] == chave)
-                    return meio;
-                else
-                {
-                    if (chave > vetor[meio])
-                        cursor = meio + 1;
-                    else
-                        ultimoElemento = meio - 1;
-                }
-            }
-
-            return -1;
+            SortByAux(propertyGetter, tipoDaPropriedade, indiceInicial, indiceFinal);
         }
 
         //T&
-        T* Find(function<bool(T)>& predicate)
+        T* FindLinear(function<bool(T)>& predicate)
 		{
 			for (int i = 0; i < _vetor.size(); i++)
 			{
@@ -197,37 +201,54 @@ class List
 
 			return nullptr; // T();
 		}
+
+        // Busca Binaria
+        // Espera-se que o vetor esteja ordenado
+        // Retorna nullptr se o elemento não estiver presente
+        T* FindBinary(function<string(T)>& propertyGetter, string tipoDaPropriedade, string chave)
+        {
+            int indiceInicial = 0;
+            int indiceFinal = Count() - 1;
+
+            return BuscaBinaria(indiceInicial, indiceFinal, propertyGetter, tipoDaPropriedade, chave);
+        }
+
+        T* BuscaBinaria(int indiceInicial, int indiceFinal, function<string(T)>& propertyGetter, string tipoDaPropriedade, string chave)
+        { 
+            if (indiceFinal >= indiceInicial) 
+            { 
+                int meio = indiceInicial + (indiceFinal - indiceInicial) / 2;
+
+                // Igual
+                if(Compare(tipoDaPropriedade, propertyGetter(_vetor[meio]), chave) == 0)
+                    return &_vetor[meio];
+
+                if (Compare(tipoDaPropriedade, propertyGetter(_vetor[meio]), chave) == 1) 
+                     return BuscaBinaria(indiceInicial, meio - 1, propertyGetter, tipoDaPropriedade, chave); 
+
+                return BuscaBinaria(meio + 1, indiceFinal, propertyGetter, tipoDaPropriedade, chave); 
+            } 
+
+            return nullptr; 
+        }
 };
 
 int main()
 {
     List<Produto> listaDeProdutos;
+    Produto prod;
+    prod.Codigo = 10;
+    listaDeProdutos.Add(prod);
+    //function<string(Produto)> lambdaSort = [](Produto x) { return to_string(x.Codigo); };
+    //listaDeProdutos.SortBy(lambdaSort, "int");
 
-    Produto produto2;
-    produto2.Codigo = 2;
-    produto2.Nome = "Teste2";
+    //function<void(Produto&)> lambda = [](Produto& x) { x.Nome = "Mudei"; };
+    //listaDeProdutos.ForEach(lambda);
 
-    Produto produto;
-    produto.Codigo = 1;
-    produto.Nome = "Teste";
+    function<string(Produto)> lambda = [](Produto x) { return to_string(x.Codigo); };
+    Produto* encontrado = listaDeProdutos.FindBinary(lambda, "int", "10");
 
-    listaDeProdutos.Add(produto2);
-    listaDeProdutos.Add(produto);
-
-    function<void(Produto&)> lambda = [](Produto& x) { x.Nome = "Mudei"; };
-    listaDeProdutos.ForEach(lambda);
-
-    listaDeProdutos.ForEach(ImprimaProduto);
-
-    //function<void(Produto*)> lambda2 = [](Produto* x) { ImprimaProduto(*x); };
-    //listaDeProdutos.ForEach(lambda2);
-
-    //function<string(Produto)> lambda1 = [](Produto x) { return to_string(x.Codigo); };
-    //listaDeProdutos.SortBy(lambda1);
-
-    //function<bool(Produto)> lambda = [](Produto x) { return x.Codigo == 3; };
-    //Produto encontrado = *listaDeProdutos.Find(lambda);
-
+    if(encontrado != nullptr) cout << encontrado->Codigo;
 
     std::cout << "\n";
     //std::system("clear");
