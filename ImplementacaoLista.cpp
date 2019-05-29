@@ -149,6 +149,11 @@ class List
             }
         }
 
+        void Insert(int indice)
+        {
+            _vetor.insert(indice);
+        }
+
         void RemoveAt(int index)
         {
             _vetor.erase(index);
